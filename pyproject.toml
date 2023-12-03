@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "adventofcode"
+version = "0.1.0"
+description = ""
+authors = ["Samuel Laroche <slplaroche@gmail.com>"]
+readme = "README.md"
+include = ["adventofcode/day*.txt"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+natsort = "^8.2.0"
+click = "^8.1.7"
+mypy = "^1.7.1"
+
+[tool.poetry.dev-dependencies]
+black = "^22.12.0"
+isort = "^5.11.4"
+
+[tool.poetry.scripts]
+day = "adventofcode.day:hello"
+
+[tool.black]
+target_version = ["py311"]
+
+[tool.isort]
+profile = "black"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
