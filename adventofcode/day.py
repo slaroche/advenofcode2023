@@ -2,7 +2,7 @@ import typing as t
 
 import click
 
-from adventofcode import day1, day2, day3
+from adventofcode import day1, day2, day3, day4
 from adventofcode.utils import Result, load_input
 
 
@@ -13,11 +13,7 @@ class Handler(t.Protocol):
         ...
 
 
-handlers: list[Handler] = [
-    day1,
-    day2,
-    day3,
-]
+handlers: list[Handler] = [day1, day2, day3, day4]
 
 
 @click.command()
