@@ -1,5 +1,4 @@
-# [Advent of Code 2022](https://adventofcode.com/2022)
-### my answers in [Python](https://www.python.org/) ![Python CI](https://github.com/ephemient/aoc2022/workflows/Python%20CI/badge.svg)
+# [Advent of Code 2023](https://adventofcode.com/2023)
 
 This project builds with [Poetry](https://python-poetry.org/).
 
@@ -10,28 +9,18 @@ curl -sSL https://install.python-poetry.org | python3 -
 poetry install
 ```
 
-Run the test suite:
-
-```sh
-poetry run pytest
-```
-
-Run the benchmarks:
-
-```sh
-poetry run pytest --benchmark-enable
-```
-
 Print solutions for the inputs provided in local data files:
 
 ```sh
-poetry run aoc2022
+poetry run day --help
+poetry run day 1
+poetry run day 2 -e
+poetry run day 8 -p 1 -i example_
 ```
 
-Lint and format code with [Black](https://black.readthedocs.io/), [pylint](https://github.com/PyCQA/pylint), and [isort](https://pycqa.github.io/isort/):
+Lint and format code with [Black](https://black.readthedocs.io/), [mypy](https://github.com/python/mypy), and [isort](https://pycqa.github.io/isort/):
 
 ```sh
-poetry run black .
-poetry run isort .
-poetry run pylint aoc2022
+make mypy
+make format
 ```

@@ -1,5 +1,5 @@
 format: 
 	poetry run black . && poetry run isort .
 
-lint:
+mypy:
 	poetry run mypy . 
