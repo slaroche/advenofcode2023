@@ -1,3 +1,5 @@
+from functools import partial
+
 from adventofcode.utils import Result
 
 digits = {
@@ -51,6 +53,7 @@ def _run(input: list[str], include_spelled_digit: bool = False) -> int:
 
 def run(input: list[str]) -> Result:
     return Result(
-        answer_1=_run(input, include_spelled_digit=False),
-        answer_2=_run(input, include_spelled_digit=True),
+        input=input,
+        part_1=partial(_run, include_spelled_digit=False),
+        part_2=partial(_run, include_spelled_digit=True),
     )

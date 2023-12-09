@@ -74,7 +74,7 @@ def format_line(line: str) -> Game:
     return game
 
 
-def first_puzzle(input: list[str]) -> int:
+def part_1(input: list[str]) -> int:
     total: int = 0
     for line in input:
         game = format_line(line)
@@ -84,7 +84,7 @@ def first_puzzle(input: list[str]) -> int:
     return total
 
 
-def second_puzzle(input: list[str]) -> int:
+def part_2(input: list[str]) -> int:
     total: int = 0
     for line in input:
         game = format_line(line)
@@ -94,6 +94,7 @@ def second_puzzle(input: list[str]) -> int:
 
 def run(input: list[str]) -> Result:
     return Result(
-        answer_1=first_puzzle(input),
-        answer_2=second_puzzle(input),
+        input=input,
+        part_1=part_1,
+        part_2=part_2,
     )

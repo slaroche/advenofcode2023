@@ -160,7 +160,7 @@ def parse_gear(
     return pos
 
 
-def first_puzzle(input: list[str]) -> int:
+def part_1(input: list[str]) -> int:
     parts = []
     for y, line in enumerate(input):
         for x, value in enumerate(line):
@@ -181,7 +181,7 @@ def first_puzzle(input: list[str]) -> int:
     return sum(parts)
 
 
-def second_puzzle(input: list[str]) -> int:
+def part_2(input: list[str]) -> int:
     gears: list[int] = []
     for y, line in enumerate(input):
         for x, value in enumerate(line):
@@ -210,6 +210,7 @@ def second_puzzle(input: list[str]) -> int:
 
 def run(input: list[str]) -> Result:
     return Result(
-        answer_1=first_puzzle(input),
-        answer_2=second_puzzle(input),
+        input=input,
+        part_1=part_1,
+        part_2=part_2,
     )

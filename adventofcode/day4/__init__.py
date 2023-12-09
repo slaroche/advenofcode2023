@@ -1,6 +1,6 @@
-from collections import defaultdict
 import dataclasses
 import typing as t
+from collections import defaultdict
 
 from adventofcode.utils import Result
 
@@ -26,6 +26,10 @@ class Card:
     def mathing_numbers(self) -> list[int]:
         return [n for n in self.numbers if n in self.winning_numbers]
 
+    @property
+    def mathing_count(self) -> int:
+        return len(self.mathing_numbers)
+
     def total(self) -> int:
         num = self.mathing_numbers.copy()
         total = 0
@@ -37,25 +41,25 @@ class Card:
         return total
 
 
-def first_puzzle(input: list[str]) -> int:
+def part_1(input: list[str]) -> int:
     cards = [Card.parse(line) for line in input]
     return sum(c.total() for c in cards)
 
 
-def second_puzzle(input: list[str]) -> int:
-    cards: dict[int,int] = defaultdict(lambda: 1)
+def part_2(input: list[str]) -> int:
+    cards: dict[int, int] = defaultdict(lambda: 1)
     for line in input:
         card = Card.parse(line)
         start = card.id + 1
-        end = start + len(card.mathing_numbers)
+        end = start + card.mathing_count
         for i in range(start, end):
             cards[i] += cards[card.id]
-
     return sum(cards.values())
 
 
 def run(input: list[str]) -> Result:
     return Result(
-        answer_1=first_puzzle(input),
-        answer_2=second_puzzle(input),
+        input=input,
+        part_1=part_1,
+        part_2=part_2,
     )

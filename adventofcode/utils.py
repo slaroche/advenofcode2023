@@ -3,30 +3,24 @@ import enum
 import os
 import typing as t
 
-
-class Part(enum.IntEnum):
-    FIRST = 1
-    SECOND = 2
+PuzzleFn: t.TypeAlias = t.Callable[[list[str]], int]
 
 
 @dataclasses.dataclass
 class Result:
-    answer_1: int | None = None
-    answer_2: int | None = None
+    input: list[str]
+    part_1: PuzzleFn
+    part_2: PuzzleFn
 
-    error: str | None = None
+    def print_answers(self) -> None:
+        self.print_part_1()
+        self.print_part_2()
 
-    def print(self) -> None:
-        if self.error:
-            print(f"Error: {self.error}")
-            return None
+    def print_part_1(self) -> None:
+        print(f"Part 1 answer: {self.part_1(self.input)}")
 
-        if self.answer_1:
-            print(f"Part one puzzle answer is: {self.answer_1}")
-        else:
-            print(f"Waiting for part one puzzle answer")
-        if self.answer_2:
-            print(f"Part two puzzle answer is: {self.answer_2}")
+    def print_part_2(self) -> None:
+        print(f"Part 2 answer: {self.part_2(self.input)}")
 
 
 def get_file_path(name: str) -> str:
