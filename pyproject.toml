@@ -20,6 +20,7 @@ isort = "^5.11.4"
 day = "adventofcode.day:hello"
 
 [tool.black]
+line-length = 90
 target_version = ["py311"]
 
 [tool.isort]
