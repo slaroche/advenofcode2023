@@ -1,4 +1,5 @@
-from collections import defaultdict
+import dataclasses
+import typing as t
 
 from aoc2023.utils import Handler
 
@@ -46,87 +47,98 @@ def part_1(input: list[str]) -> int:
     return min(dest)
 
 
-def parse_seed_ranges(line: str) -> list[tuple[int, int]]:
-    _, numbers = line.split(":", 1)
-    seed_ranged = [int(n) for n in numbers.split(" ") if n != ""]
-    seeds = []
-    s = 0
-    for i, r in enumerate(seed_ranged):
-        if i % 2:
-            seeds.append((s, r))
-        else:
-            s = r
-    return seeds
+@dataclasses.dataclass
+class Datum:
+    value: int
+    range: int
+
+    @property
+    def upper_bound(self) -> int:
+        return self.value + self.range
 
 
-def process(
-    seeds: tuple[int, int], src: tuple[int, int], dest: int
-) -> tuple[list[tuple[int, int]], list[tuple[int, int]]]:
-    rest = []
-    diff = dest - src[0]
-    l = max(src[0], seeds[0])
-    u = min(src[0] + src[1], seeds[0] + seeds[1])
-    if l > u:
-        return [], []
-    if seeds[0] < l:
-        rest.append((seeds[0], l - seeds[0]))
-    if seeds[0] + seeds[1] > u:
-        rest.append(
-            (
-                seeds[0] + seeds[1] + 1,
-                seeds[0] + seeds[1] - u,
-            )
+@dataclasses.dataclass
+class Mapping:
+    src: int
+    dest: int
+
+    range: int
+
+    @property
+    def src_upper_bound(self) -> int:
+        return self.src + self.range
+
+    @property
+    def dest_upper_bound(self) -> int:
+        return self.dest + self.range
+
+    @classmethod
+    def parse(cls, line: str) -> t.Self:
+        d, s, r = line.split(" ")
+        return cls(
+            src=int(s),
+            dest=int(d),
+            range=int(r),
         )
-    return [(l + diff, u - l)], rest
+
+    def get_seg(self, datum: Datum) -> tuple[list[Datum], list[Datum]]:
+        seg = []
+        diff = self.dest - self.src
+        l = max(self.src, datum.value)
+        u = min(self.src_upper_bound, datum.upper_bound)
+        if l > u:
+            return [], [datum]
+        if datum.value < l:
+            seg.append(dataclasses.replace(datum, range=l - datum.value))
+        if datum.upper_bound > u:
+            seg.append(
+                Datum(
+                    value=datum.upper_bound + 1,
+                    range=datum.upper_bound - u,
+                )
+            )
+        return [Datum(value=l + diff, range=u - l)], seg
+
+
+def parse_data(line: str) -> list[Datum]:
+    _, numbers = line.split(":", 1)
+    data = []
+    value = 0
+    for i, range_ in enumerate(int(n) for n in numbers.split(" ") if n != ""):
+        if i % 2:
+            data.append(Datum(value, range_))
+        else:
+            value = range_
+    return data
 
 
 def part_2(input: list[str]) -> int:
-    src: list[tuple[int, int]] = []
-    dest: list[tuple[int, int]] = []
-
-    map: dict[tuple[int, int], int] = {}
+    data: list[Datum] = []
+    dest: list[Datum] = []
 
     for i, line in enumerate(input):
         if i == 0:
-            dest = parse_seed_ranges(line)
+            dest = parse_data(line)
             continue
 
-        if i == 1:
-            continue
-
-        if line == "" or line == "end":
-            src = dest.copy()
-            dest = []
-            print("src", src)
-            while src:
-                seeds = src.pop()
-                add_to_dest = True
-                for bounds, d in map.items():
-                    d, rest = process(seeds=seeds, src=bounds, dest=d)
-                    dest.extend(d)
-                    src.extend(rest)
-                    print("process", seeds, bounds, d, rest)
-                    print("src", src)
-                    if rest:
-                        add_to_dest = False
-                    if d and not rest:
-                        add_to_dest = False
-                if add_to_dest:
-                    dest.append(seeds)
-            breakpoint()
+        if line == "":
             continue
 
         if line[0].isalpha():
-            map = {}
+            data.extend(dest.copy())
+            dest = []
             continue
 
-        d, s, r = line.split(" ")
-        s = int(s)
-        d = int(d)
-        r = int(r)
-        map[(s, r)] = d
+        mapping = Mapping.parse(line)
 
-    return min(d for d, _ in dest)
+        src = []
+        for datum in data:
+            converted_datum, seg = mapping.get_seg(datum)
+            dest.extend(converted_datum)
+            src.extend(seg)
+        data = src.copy()
+
+    return min(d.value for d in data)
 
 
 def create_handler(input: list[str]) -> Handler:

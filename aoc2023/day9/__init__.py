@@ -1,6 +1,4 @@
 import dataclasses
-import pprint
-import typing as t
 from collections import UserList
 from functools import partial
 

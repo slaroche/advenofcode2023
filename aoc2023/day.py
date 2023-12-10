@@ -17,7 +17,7 @@ from aoc2023.utils import load_input
     type=click.Choice(["all", "1", "2"]),
     help="Run specific part.",
 )
-@click.argument("day")
+@click.argument("day", type=click.Choice([str(x) for x in range(1, 25)]))
 def main(example: bool, input_file: str, part: str, day: str) -> None:
     module: DayModule = importlib.import_module(f"{__name__}{day}")
     input = load_input(module, file_name=input_file or None, example=example)

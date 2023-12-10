@@ -1,10 +1,12 @@
 format: 
-	poetry run black . && poetry run isort .
+	poetry run black . 
+	poetry run autoflake .
+	poetry run isort .
 
 mypy:
 	poetry run mypy . 
 
-.venv:
+.venv: pyproject.toml
 	mkdir .venv
 	poetry install
 
