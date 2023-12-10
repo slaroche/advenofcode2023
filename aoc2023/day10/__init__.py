@@ -1,8 +1,8 @@
 import dataclasses
 import enum
+import typing as t
 
 from aoc2023.utils import Handler
-import typing as t
 
 
 class Tile(enum.Enum):
@@ -15,69 +15,13 @@ class Tile(enum.Enum):
     S = "S"
     G = "."
 
-connections = {
-    Tile.V: [
-        Tile.SW,
-        Tile.SE,
-        Tile.NW,
-        Tile.NE,
-    ],
-    Tile.H: [
-        Tile.SW,
-        Tile.SE,
-        Tile.NW,
-        Tile.NE,
-    ],
-    Tile.NE: [
-        Tile.H,
-        Tile.V,
-        Tile.SW,
-        Tile.SE,
-        Tile.NW,
-    ],
-    Tile.NW: [
-        Tile.H,
-        Tile.V,
-        Tile.SW,
-        Tile.SE,
-        Tile.NE,
-    ],
-    Tile.SE: [
-        Tile.H,
-        Tile.V,
-        Tile.NW,
-        Tile.NE,
-        Tile.SW,
-    ],
-    Tile.SW: [
-        Tile.H,
-        Tile.V,
-        Tile.NW,
-        Tile.NE,
-        Tile.SE,
-    ],
-    Tile.S: [
-        Tile.H,
-        Tile.V,
-        Tile.NW,
-        Tile.NE,
-        Tile.SE,
-        Tile.SW,
-    ],
-}
-
-@dataclasses.dataclass
-class Grid:
-    height: int
-    width: int
-
 
 @dataclasses.dataclass
 class Pipe:
     value: Tile
     pos: tuple[int, int]
     max_i: int = dataclasses.field(repr=False)
-    max_j: int= dataclasses.field(repr=False)
+    max_j: int = dataclasses.field(repr=False)
     grid: dict[tuple[int, int], "Pipe"] = dataclasses.field(repr=False)
 
     @property
@@ -108,7 +52,6 @@ class Pipe:
         ):
             return None
         return pipe
-
 
     @property
     def s_conn(self) -> t.Optional["Pipe"]:
@@ -163,7 +106,7 @@ class Pipe:
             or self.value is Tile.SW
         ):
             return None
-        pipe = self.grid[(self.i, self.j -1)]
+        pipe = self.grid[(self.i, self.j - 1)]
         if not (
             pipe.value is Tile.H
             or pipe.value is Tile.S
@@ -175,12 +118,16 @@ class Pipe:
 
     @property
     def all_conn(self) -> list["Pipe"]:
-        return [c for c in [
-            self.n_conn,
-            self.s_conn,
-            self.e_conn,
-            self.w_conn,
-        ] if c]
+        return [
+            c
+            for c in [
+                self.n_conn,
+                self.s_conn,
+                self.e_conn,
+                self.w_conn,
+            ]
+            if c
+        ]
 
     @property
     def left(self) -> "Pipe":
@@ -199,30 +146,36 @@ class Pipe:
             return self.right, self
         return self.left, self
 
-
-    @property
-    def is_connected(self) -> bool:
-        return self.value is Tile.S or self.all_conn
-    
     @property
     def is_start(self) -> bool:
         return self.value is Tile.S
 
 
+@dataclasses.dataclass
+class Cursor:
+    current: Pipe
+    previous: Pipe
+
+    @classmethod
+    def from_start(cls, start: Pipe) -> tuple[t.Self, t.Self]:
+        right = cls(start.right, start)
+        left = cls(start.left, start)
+        return right, left
+
+    @classmethod
+    def from_cursor(cls, cursor: t.Self) -> t.Self:
+        return cls(*cursor.current.next(cursor.previous))
+
+    def __eq__(self, __value: t.Self) -> bool:
+        return self.current == __value.current
+
 
 def part_1(input: list[str]) -> int:
-    total = 1
     grid: dict[tuple[int, int], Pipe] = {}
     start: Pipe = None
     for i, line in enumerate(input):
         for j, tile in enumerate(line):
-            pipe = Pipe(
-                Tile(tile), 
-                (i, j), 
-                len(input) - 1,
-                len(line) - 1,
-                grid
-            )
+            pipe = Pipe(Tile(tile), (i, j), len(input) - 1, len(line) - 1, grid)
             grid[(i, j)] = pipe
             if pipe.is_start:
                 start = pipe
@@ -230,19 +183,13 @@ def part_1(input: list[str]) -> int:
     if not start:
         return total
 
-    right: Pipe = start.right
-    previous_right: Pipe = start
+    right, left = Cursor.from_start(start)
 
-    left: Pipe = start.left
-    previous_left: Pipe = start
-
-    print("start", start)
-    print("right", start.right, "left", start.left)
+    total = 1
     while right != left:
         total += 1
-        right, previous_right = right.next(previous_right)
-        left, previous_left = left.next(previous_left)
-        print(total, "right", right, "left", left, "is different", right != left)
+        right = Cursor.from_cursor(right)
+        left = Cursor.from_cursor(left)
     return total
 
 
