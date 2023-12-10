@@ -3,7 +3,7 @@ import pprint
 import typing as t
 from collections import defaultdict
 
-from adventofcode.utils import Result
+from aoc2023.utils import Handler
 
 card_values = {
     "2": 1,
@@ -110,13 +110,12 @@ def part_2(input: list[str]) -> int:
         if sum(x.cards.values()) != 5:
             breakpoint()
     return sum(
-        h.total(i)
-        for i, h in enumerate(sorted(Hand.parse(line, True) for line in input))
+        h.total(i) for i, h in enumerate(sorted(Hand.parse(line, True) for line in input))
     )
 
 
-def run(input: list[str]) -> Result:
-    return Result(
+def create_handler(input: list[str]) -> Handler:
+    return Handler(
         input=input,
         part_1=part_1,
         part_2=part_2,

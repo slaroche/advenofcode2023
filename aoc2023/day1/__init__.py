@@ -1,6 +1,6 @@
 from functools import partial
 
-from adventofcode.utils import Result
+from aoc2023.utils import Handler
 
 digits = {
     "one": 1,
@@ -51,8 +51,8 @@ def _run(input: list[str], include_spelled_digit: bool = False) -> int:
     return total
 
 
-def run(input: list[str]) -> Result:
-    return Result(
+def create_handler(input: list[str]) -> Handler:
+    return Handler(
         input=input,
         part_1=partial(_run, include_spelled_digit=False),
         part_2=partial(_run, include_spelled_digit=True),

@@ -2,7 +2,7 @@ import dataclasses
 import typing as t
 from collections import defaultdict
 
-from adventofcode.utils import Result
+from aoc2023.utils import Handler
 
 
 class Pos(t.NamedTuple):
@@ -208,8 +208,8 @@ def part_2(input: list[str]) -> int:
     return sum(gears)
 
 
-def run(input: list[str]) -> Result:
-    return Result(
+def create_handler(input: list[str]) -> Handler:
+    return Handler(
         input=input,
         part_1=part_1,
         part_2=part_2,

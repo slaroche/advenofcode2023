@@ -18,7 +18,7 @@ poetry run day 2 -e
 poetry run day 8 -p 1 -i example_
 ```
 
-Lint and format code with [Black](https://black.readthedocs.io/), [mypy](https://github.com/python/mypy), and [isort](https://pycqa.github.io/isort/):
+Lint and format code with [Black](https://black.readthedocs.io/), [mypy](https://mypy.readthedocs.io/en/stable/), and [isort](https://pycqa.github.io/isort/):
 
 ```sh
 make mypy

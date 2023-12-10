@@ -4,7 +4,7 @@ import typing as t
 from collections import UserList
 from functools import partial
 
-from adventofcode.utils import Result
+from aoc2023.utils import Handler
 
 
 @dataclasses.dataclass(init=False, repr=False)
@@ -58,8 +58,8 @@ def _run(input: list[str], reverse: bool) -> int:
     return total
 
 
-def run(input: list[str]) -> Result:
-    return Result(
+def create_handler(input: list[str]) -> Handler:
+    return Handler(
         input=input,
         part_1=partial(_run, reverse=False),
         part_2=partial(_run, reverse=True),

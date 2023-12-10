@@ -2,7 +2,8 @@ import collections
 import dataclasses
 import typing as t
 
-from adventofcode.utils import Result, multiply
+from aoc2023.utils import Handler
+from aoc2023.utils import multiply
 
 config = {
     "red": 12,
@@ -92,8 +93,8 @@ def part_2(input: list[str]) -> int:
     return total
 
 
-def run(input: list[str]) -> Result:
-    return Result(
+def create_handler(input: list[str]) -> Handler:
+    return Handler(
         input=input,
         part_1=part_1,
         part_2=part_2,

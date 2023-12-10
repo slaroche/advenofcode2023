@@ -1,13 +1,16 @@
 import dataclasses
-import enum
 import os
 import typing as t
 
 PuzzleFn: t.TypeAlias = t.Callable[[list[str]], int]
 
 
+class NamedModule(t.Protocol):
+    __name__: str
+
+
 @dataclasses.dataclass
-class Result:
+class Handler:
     input: list[str]
     part_1: PuzzleFn
     part_2: PuzzleFn
@@ -23,15 +26,34 @@ class Result:
         print(f"Part 2 answer: {self.part_2(self.input)}")
 
 
-def get_file_path(name: str) -> str:
+class DayModule(t.Protocol):
+    __name__: str
+
+    def create_handler(self, input: list[str]) -> Handler:
+        ...
+
+
+def get_module_name(module: NamedModule) -> str:
+    return module.__name__.split(".")[-1]
+
+
+def get_file_path(rel_path: str) -> str:
     script_dir = os.path.dirname(__file__)
-    rel_path: str = name + ".txt"
     abs_file_path = os.path.join(script_dir, rel_path)
     return abs_file_path
 
 
-def load_input(name: str) -> list[str]:
-    with open(get_file_path(name), "r") as file:
+def load_input(
+    module: DayModule,
+    *,
+    file_name: str | None = None,
+    example: bool = False,
+) -> list[str]:
+    name = get_module_name(module)
+    default_file_name = "example" if example else "input"
+    file_name = file_name or f"{default_file_name}.txt"
+    rel_path = f"{name}/{file_name}"
+    with open(get_file_path(rel_path), "r") as file:
         return [l for l in file.read().strip().split("\n")]
 
 
