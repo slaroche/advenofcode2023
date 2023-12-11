@@ -1,19 +1,43 @@
 import dataclasses
 import enum
 import typing as t
+from collections import defaultdict
 
 from aoc2023.utils import Handler
 
 
 class Tile(enum.Enum):
-    V = "|"
+    NW = "J"
+
     H = "-"
     NE = "L"
-    NW = "J"
+
     SE = "F"
+
+    V = "|"
     SW = "7"
+
     S = "S"
     G = "."
+
+
+H_TILE = [
+    Tile.H,
+    Tile.S,
+    Tile.NE,
+    Tile.NW,
+    Tile.SE,
+    Tile.SW,
+]
+
+V_TILE = [
+    Tile.V,
+    Tile.S,
+    Tile.NE,
+    Tile.NW,
+    Tile.SE,
+    Tile.SW,
+]
 
 
 @dataclasses.dataclass
@@ -23,6 +47,11 @@ class Pipe:
     max_i: int = dataclasses.field(repr=False)
     max_j: int = dataclasses.field(repr=False)
     grid: dict[tuple[int, int], "Pipe"] = dataclasses.field(repr=False)
+    is_loop: bool = False
+    _is_inside: bool | None = None
+
+    def __post_init__(self) -> None:
+        self.is_loop = self.value is Tile.S
 
     @property
     def i(self) -> int:
@@ -150,16 +179,65 @@ class Pipe:
     def is_start(self) -> bool:
         return self.value is Tile.S
 
+    @property
+    def n_pipe_count(self) -> int:
+        count = 0
+        if self.i == 0:
+            return count
+        for i in range(self.i):
+            pipe: Pipe = self.grid[(i, self.j)]
+            if pipe.is_loop and (
+                pipe.value is Tile.H or pipe.value is Tile.NE or pipe.value is Tile.SE
+            ):
+                count += 1
+        return count
+
+    @property
+    def w_pipe_count(self) -> int:
+        count = 0
+        if self.j == 0:
+            return count
+        for j in range(self.j):
+            pipe: Pipe = self.grid[(self.i, j)]
+            if pipe.is_loop and (
+                pipe.value is Tile.V
+                or pipe.value is Tile.S
+                or pipe.value is Tile.SW
+                or pipe.value is Tile.SE
+            ):
+                count += 1
+        return count
+
+    @property
+    def is_inside(self) -> bool:
+        if self._is_inside is not None:
+            return self._is_inside
+
+        is_inside = False
+        if not self.is_loop:
+            is_inside = (
+                (self.n_pipe_count > 0 and self.w_pipe_count > 0)
+                and self.n_pipe_count % 2 != 0
+                and self.w_pipe_count % 2 != 0
+            )
+
+        self._is_inside = is_inside
+        return is_inside
+
 
 @dataclasses.dataclass
 class Cursor:
     current: Pipe
     previous: Pipe
 
+    def __post_init__(self) -> None:
+        self.current.is_loop = True
+
     @classmethod
     def from_start(cls, start: Pipe) -> tuple[t.Self, t.Self]:
         right = cls(start.right, start)
         left = cls(start.left, start)
+
         return right, left
 
     @classmethod
@@ -170,7 +248,7 @@ class Cursor:
         return self.current == __value.current
 
 
-def part_1(input: list[str]) -> int:
+def get_start(input: list[str]) -> Pipe:
     grid: dict[tuple[int, int], Pipe] = {}
     start: Pipe = None
     for i, line in enumerate(input):
@@ -181,8 +259,20 @@ def part_1(input: list[str]) -> int:
                 start = pipe
 
     if not start:
-        return total
+        raise ValueError()
+    return start
 
+
+def print_grid(grid: dict[tuple[int, int], Pipe]) -> None:
+    lines: dict[int, str] = defaultdict(lambda: "")
+    for p in grid.values():
+        lines[p.i] += p.value.value if p.is_loop else ("*" if p.is_inside else "#")
+    for l in lines.values():
+        print(l)
+
+
+def part_1(input: list[str]) -> int:
+    start = get_start(input)
     right, left = Cursor.from_start(start)
 
     total = 1
@@ -194,9 +284,29 @@ def part_1(input: list[str]) -> int:
 
 
 def part_2(input: list[str]) -> int:
-    total = 0
+    start = get_start(input)
+    right, left = Cursor.from_start(start)
+    while right != left:
+        right = Cursor.from_cursor(right)
+        left = Cursor.from_cursor(left)
 
-    return total
+    grid = start.grid
+
+    # Collect outsiders
+    outsiders: list[Pipe] = []
+    for pipe in grid.values():
+        if not pipe.is_loop and not pipe.is_inside:
+            outsiders.append(pipe)
+
+    # Propagate outsiders
+    # for pipe in outsiders:
+    #     for insider in pipe.inside_neighbors:
+    #         insider.is_inside = False
+    #         outsiders.append(insider)
+
+    print_grid(grid)
+
+    return len([p for p in grid.values() if p.is_inside])
 
 
 def create_handler(input: list[str]) -> Handler:

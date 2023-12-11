@@ -1,5 +1,7 @@
+import contextlib
 import dataclasses
 import os
+import sys
 import typing as t
 
 PuzzleFn: t.TypeAlias = t.Callable[[list[str]], int]
@@ -14,16 +16,34 @@ class Handler:
     input: list[str]
     part_1: PuzzleFn
     part_2: PuzzleFn
+    block_prints: bool = False
+
+    # Disable
+    @contextlib.contextmanager
+    def print_context(self) -> t.Iterator[None]:
+        if self.block_prints:
+            sys.stdout = open(os.devnull, "w")
+        yield
+        if self.block_prints:
+            sys.stdout = sys.__stdout__
 
     def print_answers(self) -> None:
         self.print_part_1()
         self.print_part_2()
 
     def print_part_1(self) -> None:
-        print(f"Part 1 answer: {self.part_1(self.input)}")
+        print(f"Part 1 answer: {self.answer_part_1()}")
 
     def print_part_2(self) -> None:
-        print(f"Part 2 answer: {self.part_2(self.input)}")
+        print(f"Part 2 answer: {self.answer_part_2()}")
+
+    def answer_part_1(self) -> int:
+        with self.print_context():
+            return self.part_1(self.input)
+
+    def answer_part_2(self) -> int:
+        with self.print_context():
+            return self.part_2(self.input)
 
 
 class DayModule(t.Protocol):
