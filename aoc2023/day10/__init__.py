@@ -213,16 +213,15 @@ class Pipe:
         if self._is_inside is not None:
             return self._is_inside
 
-        is_inside = False
+        self.is_inside = False
         if not self.is_loop:
-            is_inside = (
-                (self.n_pipe_count > 0 and self.w_pipe_count > 0)
-                and self.n_pipe_count % 2 != 0
-                and self.w_pipe_count % 2 != 0
-            )
+            return self.is_inside
 
-        self._is_inside = is_inside
-        return is_inside
+        if self.n_pipe_count > 0 and self.w_pipe_count > 0:
+            return self.is_inside
+
+        self.is_inside = self.n_pipe_count % 2 != 0 and self.w_pipe_count % 2 != 0
+        return self.is_inside
 
 
 @dataclasses.dataclass
@@ -290,23 +289,7 @@ def part_2(input: list[str]) -> int:
         right = Cursor.from_cursor(right)
         left = Cursor.from_cursor(left)
 
-    grid = start.grid
-
-    # Collect outsiders
-    outsiders: list[Pipe] = []
-    for pipe in grid.values():
-        if not pipe.is_loop and not pipe.is_inside:
-            outsiders.append(pipe)
-
-    # Propagate outsiders
-    # for pipe in outsiders:
-    #     for insider in pipe.inside_neighbors:
-    #         insider.is_inside = False
-    #         outsiders.append(insider)
-
-    print_grid(grid)
-
-    return len([p for p in grid.values() if p.is_inside])
+    return len([p for p in start.grid.values() if p.is_inside])
 
 
 def create_handler(input: list[str]) -> Handler:
