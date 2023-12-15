@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 set -eo pipefail
-set -x
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/../ && pwd )"
 
@@ -23,7 +22,7 @@ touch ${CHALLENGE_DIR}/__init__.py
 touch ${CHALLENGE_DIR}/input.txt
 touch ${CHALLENGE_DIR}/example.txt
 
-cat <<-EOF >> ${CHALLENGE_DIR}/__init__.py 
+cat <<-EOF> "${CHALLENGE_DIR}/__init__.py" 
 from aoc2023.utils import Handler
 
 
@@ -43,4 +42,4 @@ def create_handler(input: list[str]) -> Handler:
         part_1=part_1,
         part_2=part_2,
     )
-    EOF
+EOF
