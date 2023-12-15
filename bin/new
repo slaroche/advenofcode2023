@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+set -x
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/../ && pwd )"
+
+# No args
+function print_usage {
+    echo "Usage: $0 <day>" >&2
+    exit 1
+}
+
+# We need at least one argument
+if [ "$#" -lt 1 ]; then
+    print_usage
+fi
+
+CHALLENGE_DIR="${DIR}/aoc2023/day$1"
+
+mkdir ${CHALLENGE_DIR}
+touch ${CHALLENGE_DIR}/__init__.py
+touch ${CHALLENGE_DIR}/input.txt
+touch ${CHALLENGE_DIR}/example.txt
+
+cat <<-EOF >> ${CHALLENGE_DIR}/__init__.py 
+from aoc2023.utils import Handler
+
+
+def part_1(input: list[str]) -> int:
+    total = 0
+    return total
+
+
+def part_2(input: list[str]) -> int:
+    total = 0
+    return total
+
+
+def create_handler(input: list[str]) -> Handler:
+    return Handler(
+        input=input,
+        part_1=part_1,
+        part_2=part_2,
+    )
+    EOF

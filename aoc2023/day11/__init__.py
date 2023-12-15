@@ -1,4 +1,5 @@
 from functools import partial
+
 from aoc2023.utils import Handler
 
 
@@ -32,11 +33,19 @@ def run(input: list[str], multiplier: int) -> int:
     for i, galaxy in enumerate(galaxies):
         for pair in galaxies[i:]:
             total += (
-                max(galaxy[1] + (galaxy[0] * multiplier), pair[1] + (pair[0] * multiplier))
-                - min(galaxy[1] + (galaxy[0] * multiplier), pair[1] + (pair[0] * multiplier))
+                max(
+                    galaxy[1] + (galaxy[0] * multiplier), pair[1] + (pair[0] * multiplier)
+                )
+                - min(
+                    galaxy[1] + (galaxy[0] * multiplier), pair[1] + (pair[0] * multiplier)
+                )
             ) + (
-                max(galaxy[3] + (galaxy[2] * multiplier), pair[3] + (pair[2] * multiplier))
-                - min(galaxy[3] + (galaxy[2] * multiplier), pair[3] + (pair[2] * multiplier))
+                max(
+                    galaxy[3] + (galaxy[2] * multiplier), pair[3] + (pair[2] * multiplier)
+                )
+                - min(
+                    galaxy[3] + (galaxy[2] * multiplier), pair[3] + (pair[2] * multiplier)
+                )
             )
 
     return total
@@ -46,5 +55,5 @@ def create_handler(input: list[str]) -> Handler:
     return Handler(
         input=input,
         part_1=partial(run, multiplier=1),
-        part_2=partial(run, multiplier=1000000 - 1)
+        part_2=partial(run, multiplier=1000000 - 1),
     )
